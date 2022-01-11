@@ -1,4 +1,4 @@
-import { Box, Checkbox, TableCell, TableHead, TableRow, TableSortLabel } from '@mui/material';
+import { Box, TableCell, TableHead, TableRow, TableSortLabel } from '@mui/material';
 // material
 import { visuallyHidden } from '@mui/utils';
 import React from 'react';
@@ -10,9 +10,7 @@ interface UserListHeadProps {
   orderBy: string,
   rowCount: number,
   headLabel: any[],
-  numSelected: number,
   onRequestSort: any,
-  onSelectAllClick: any
 };
 
 const UserListHead: React.FunctionComponent<UserListHeadProps> = ({
@@ -20,9 +18,7 @@ const UserListHead: React.FunctionComponent<UserListHeadProps> = ({
   orderBy,
   rowCount,
   headLabel,
-  numSelected,
   onRequestSort,
-  onSelectAllClick
 }) => {
   const createSortHandler = (property: any) => (event: any) => {
     onRequestSort(event, property);
@@ -31,13 +27,6 @@ const UserListHead: React.FunctionComponent<UserListHeadProps> = ({
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-          />
-        </TableCell>
         {headLabel.map((headCell) => (
           <TableCell
             key={headCell.id}

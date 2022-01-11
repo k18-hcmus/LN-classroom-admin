@@ -4,7 +4,7 @@ import { styled } from '@mui/material/styles';
 import { FunctionComponent, useEffect, useState } from "react";
 import { useParams } from 'react-router-dom';
 import { useAppDispatch } from "../../../app/hooks";
-import { getUserDataByStudentId } from '../../../services/user';
+import { getUserDataById } from '../../../services/user';
 import { createAlert } from '../../../slices/alert-slice';
 import SpinnerLoading from '../../components/spinner-loading';
 
@@ -54,7 +54,7 @@ const HorizontalCenterContainer = styled(Box)(({
 }));
 
 const UserProfileMapping: FunctionComponent = () => {
-    const { studentId } = useParams<{ studentId: string }>()
+    const { userId } = useParams<{ userId: string }>()
 
     const [studentInfor, setStudentInfor] = useState<any>(null)
     const [isLoading, setLoading] = useState(true)
@@ -64,73 +64,91 @@ const UserProfileMapping: FunctionComponent = () => {
         const fetchData = async () => {
             setLoading(true)
             try {
-                const result = await getUserDataByStudentId(studentId)
+                const result = await getUserDataById(userId)
                 setStudentInfor(result.data);
-            } 
+            }
             catch (err) {
                 dispatch(createAlert({
                     message: "Error when trying to fetch information student",
                     severity: "error"
                 }))
-            } 
+            }
             finally {
                 setLoading(false)
             }
 
         }
         fetchData()
-    }, [dispatch, studentId]);
+    }, [dispatch, userId]);
 
     return (
         isLoading ? (
             <SpinnerLoading />
         ) : (
             studentInfor ?
-            (<HorizontalCenterContainer>
-                <Box
-                    component="main"
-                    sx={{ m: 1, width: "30%" }}
-                >
-                    <ColumnBox>
-                        <AvatarProfile>
-                            <IconAvatar></IconAvatar>
-                        </AvatarProfile>
-                        <ChangeAvatarButton variant="outlined">Change Avatar</ChangeAvatarButton>
-                        <RowBox>
-                            <TextField
-                                margin="normal"
-                                required
-                                fullWidth
-                                label="First name"
-                                value={studentInfor.firstName}
-                                disabled={true}
-                                sx={{ mr: 1 }}
-                            />
-                            <TextField
-                                margin="normal"
-                                required
-                                fullWidth
-                                label="Last name"
-                                value={studentInfor.lastName}
-                                disabled={true}
-                                sx={{ ml: 1 }}
-                            />
-                        </RowBox>
-                        <Box mt={(theme) => theme.spacing(4)} />
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            label="Student Id"
-                            value={studentInfor.studentId}
-                            disabled={true}
-                        />
-                        <Box mt={(theme) => theme.spacing(4)} />
+                (<HorizontalCenterContainer>
+                    <Box
+                        component="main"
+                        sx={{ m: 1, width: "30%" }}
+                    >
+                        <ColumnBox>
+                            <AvatarProfile>
+                                <IconAvatar></IconAvatar>
+                            </AvatarProfile>
+                            <ChangeAvatarButton variant="outlined">Change Avatar</ChangeAvatarButton>
+                            <RowBox>
+                                <TextField
+                                    margin="normal"
+                                    required
+                                    fullWidth
+                                    label="First name"
+                                    value={studentInfor.firstName}
+                                    disabled={true}
+                                    sx={{ mr: 1 }}
+                                />
+                                <TextField
+                                    margin="normal"
+                                    required
+                                    fullWidth
+                                    label="Last name"
+                                    value={studentInfor.lastName}
+                                    disabled={true}
+                                    sx={{ ml: 1 }}
+                                />
 
-                    </ColumnBox>
-                </Box>
-            </HorizontalCenterContainer >
-            ) : <Typography>This student Id has not been registered</Typography>
+                            </RowBox>
+                            <Box mt={(theme) => theme.spacing(4)} />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                label="Email"
+                                value={studentInfor.email}
+                                disabled={true}
+                            />
+                            <Box mt={(theme) => theme.spacing(4)} />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                label="Username"
+                                value={studentInfor.username}
+                                disabled={true}
+                            />
+                            <Box mt={(theme) => theme.spacing(4)} />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                label="Student Id"
+                                value={studentInfor.studentId}
+                                disabled={true}
+                            />
+                            <Box mt={(theme) => theme.spacing(4)} />
+                        </ColumnBox>
+                    </Box>
+                </HorizontalCenterContainer >
+                ) : <Typography>This user Id does not exist!</Typography>
         )
 
 

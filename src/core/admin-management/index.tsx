@@ -1,28 +1,24 @@
-import { Edit } from '@mui/icons-material';
-import SaveIcon from '@mui/icons-material/Save';
+import plusFill from '@iconify/icons-eva/plus-fill';
+import { Icon } from '@iconify/react';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 // material
 import {
-    Card, Container, IconButton, Input, Stack, Table, TableBody,
+    Button, Card, Container, IconButton, Stack, Table, TableBody,
     TableCell, TableContainer,
     TablePagination, TableRow, Typography
 } from '@mui/material';
-import { sentenceCase } from 'change-case';
-import { filter, get } from 'lodash';
+import { filter } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { RouteName } from '../../app/routes';
-import { USER_STATUS } from '../../shared/constant';
-import { NO_MESSAGE, STUDENT_ID_WRONG } from '../../shared/messages';
-import { createAlert } from '../../slices/alert-slice';
 import { selectRoute } from '../../slices/route-slice';
 // components
-import { getAllMember, mapStudentId, User } from '../../slices/user-slice';
-import { studentIdValidation } from '../../utils/validator';
-import Label from '../components/label';
+import { Link as RouterLink } from 'react-router-dom';
+import { getAllAdmin, User } from '../../slices/user-slice';
 import Page from '../components/page';
 import SearchNotFound from '../components/search-not-found';
-import SpinnerLoading from '../components/spinner-loading';
-import { UserListHead, UserListToolbar, UserMoreMenu } from '../components/user';
+import { UserListHead, UserListToolbar } from '../components/user';
+
 //
 
 // ----------------------------------------------------------------------
@@ -31,8 +27,6 @@ const TABLE_HEAD = [
     { id: 'username', label: 'Username', alignRight: false },
     { id: 'email', label: 'Email', alignRight: false },
     { id: 'firstName', label: 'Name', alignRight: false },
-    { id: 'studentId', label: 'Student Id', alignRight: false },
-    { id: 'status', label: 'Status', alignRight: false },
     { id: 'createdAt', label: 'Created At', alignRight: false },
     { id: '', label: '', alignRight: false },
 ];
@@ -88,72 +82,13 @@ export default function UserManagement() {
     const [orderBy, setOrderBy] = useState('username');
     const [filterName, setFilterName] = useState('');
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [studentIdEdit, setStudentIdEdit] = useState<any>({});
     const dispatch = useAppDispatch();
-    const users = useAppSelector((state) => state.userReducer.managementUsers);
-
-    const isUserEditting = (id: string) => {
-        return get(studentIdEdit, `${id}.isEdit`, false)
-    }
-
-    const isEditSending = (id: string) => {
-        return get(studentIdEdit, `${id}.isLoading`, false)
-    }
-
-    const handleSaveStudentId = async (id: string, defaultStudentId: string) => {
-        const studentId = studentIdEdit[id].value !== undefined ? studentIdEdit[id].value : defaultStudentId
-        const error = studentId.length === 0 ? NO_MESSAGE : studentIdValidation(studentId)
-
-        if (error.length > 0) {
-            return dispatch(createAlert({
-                message: STUDENT_ID_WRONG,
-                severity: 'error'
-            }))
-        }
-        setStudentIdEdit({
-            ...studentIdEdit, [id]: {
-                ...studentIdEdit[id], isLoading: true
-            }
-        })
-        try {
-            await dispatch(mapStudentId({ id, studentId })).unwrap()
-            setStudentIdEdit({
-                ...studentIdEdit, [id]: {
-                    isEdit: false,
-                    isLoading: false
-                }
-            })
-        } catch (err) {
-            setStudentIdEdit({
-                ...studentIdEdit, [id]: {
-                    isEdit: true,
-                    isLoading: false
-                }
-            })
-        }
-
-    }
-
-    const handleOnChangeStudentId = (id: string) => (event: any) => {
-        setStudentIdEdit({
-            ...studentIdEdit, [id]: {
-                ...studentIdEdit[id], value: event.target.value
-            }
-        })
-    }
-
-    const handleEditStudentId = (id: string) => {
-        setStudentIdEdit({
-            ...studentIdEdit, [id]: {
-                ...studentIdEdit[id], isEdit: true
-            }
-        })
-    }
+    const users = useAppSelector((state) => state.userReducer.managementAdmins);
 
     useEffect(() => {
-        dispatch(selectRoute(RouteName.USER))
+        dispatch(selectRoute(RouteName.ADMIN))
         if (users.length === 0) {
-            dispatch(getAllMember());
+            dispatch(getAllAdmin());
         }
     }, [dispatch, users]);
 
@@ -187,8 +122,15 @@ export default function UserManagement() {
             <Container>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography variant="h4" gutterBottom>
-                        Users Management
+                        Admins Management
                     </Typography>
+                    <Button
+                        variant="contained"
+                        color='success'
+                        startIcon={<Icon icon={plusFill} />}
+                    >
+                        New Admin
+                    </Button>
                 </Stack>
 
                 <Card>
@@ -212,10 +154,8 @@ export default function UserManagement() {
                                         const {
                                             _id,
                                             username,
-                                            status,
                                             email,
                                             firstName,
-                                            studentId,
                                             lastName,
                                             createdAt
                                         } = row;
@@ -230,37 +170,11 @@ export default function UserManagement() {
                                                 <TableCell align="left">{username}</TableCell>
                                                 <TableCell align="left">{email}</TableCell>
                                                 <TableCell align="left">{`${firstName} ${lastName}`}</TableCell>
-                                                <TableCell align="left">
-                                                    <Stack direction="row" alignItems="center" spacing={2}>
-                                                        <Input defaultValue={studentId} sx={{ width: 85 }}
-                                                            disabled={!isUserEditting(_id!)} onChange={handleOnChangeStudentId(_id!)} />
-
-                                                        {isEditSending(_id!) ? <SpinnerLoading /> : (!isUserEditting(_id!) ?
-                                                            (
-                                                                <IconButton sx={{ width: '20px', height: '20px' }} onClick={() => handleEditStudentId(_id!)}>
-                                                                    <Edit sx={{ width: '16px', height: '16px' }} />
-                                                                </IconButton>
-                                                            )
-                                                            :
-                                                            (
-                                                                <IconButton sx={{ width: '20px', height: '20px' }} onClick={() => handleSaveStudentId(_id!, studentId || "")}>
-                                                                    <SaveIcon sx={{ width: '16px', height: '16px' }} />
-                                                                </IconButton>
-                                                            ))
-                                                        }
-                                                    </Stack>
-                                                </TableCell>
-                                                <TableCell align="left">
-                                                    <Label
-                                                        variant="ghost"
-                                                        color={(status !== USER_STATUS.ACTIVATED && 'error') || 'success'}
-                                                    >
-                                                        {sentenceCase(status!)}
-                                                    </Label>
-                                                </TableCell>
                                                 <TableCell align="left">{new Date(createdAt!).toLocaleString("en")}</TableCell>
                                                 <TableCell align="right">
-                                                    <UserMoreMenu id={_id!} />
+                                                    <IconButton component={RouterLink} to={`/users/${_id}`} target="_blank" rel="noopener noreferrer">
+                                                        <RemoveRedEyeIcon />
+                                                    </IconButton >
                                                 </TableCell>
                                             </TableRow>
                                         );
