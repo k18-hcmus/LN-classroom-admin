@@ -4,7 +4,7 @@ import api from './api'
 const BASE_URL = 'auth/'
 
 export const loginUser = (payload: { username: string, password: string, rememberMe?: string }) => {
-    return api.post(BASE_URL + "login", payload)
+    return api.post(BASE_URL + "login", { ...payload, isAdmin: true })
 }
 
 export const loginUserWithGoogle = (googleData: any) => {

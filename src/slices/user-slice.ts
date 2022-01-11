@@ -24,6 +24,7 @@ export interface User {
 interface InitialState {
     user: User | null,
     managementUsers: User[],
+    managementAdmins: User[],
     isAuthenticated: boolean,
     isLoading: boolean
 }
@@ -31,6 +32,7 @@ interface InitialState {
 const initialState: InitialState = {
     user: null,
     managementUsers: [],
+    managementAdmins: [],
     isAuthenticated: false,
     isLoading: true
 }
@@ -127,6 +129,48 @@ export const updateProfile = createAsyncThunk(
     }
 )
 
+export const banUser = createAsyncThunk(
+    'users/banUser',
+    async (id: string | any, thunkApi) => {
+        try {
+            const response = await userApi.banUserById(id)
+            thunkApi.dispatch(createAlert({
+                message: "Banned/unbanned user successfully!",
+                severity: 'success'
+            }))
+            thunkApi.dispatch(getAllMember())
+            return response.data
+        } catch (err) {
+            thunkApi.dispatch(createAlert({
+                message: "Error when trying to ban/unbanned user!",
+                severity: 'error'
+            }))
+            return thunkApi.rejectWithValue(err)
+        }
+    }
+)
+
+export const mapStudentId = createAsyncThunk(
+    'users/mapStudentId',
+    async ({ id, studentId }: { id: string, studentId: string } | any, thunkApi) => {
+        try {
+            const response = await userApi.mapStudentId(id, studentId)
+            thunkApi.dispatch(createAlert({
+                message: "Map student Id successfully!",
+                severity: 'success'
+            }))
+            thunkApi.dispatch(getAllMember())
+            return response.data
+        } catch (err) {
+            thunkApi.dispatch(createAlert({
+                message: "Error when trying to map student Id!",
+                severity: 'error'
+            }))
+            return thunkApi.rejectWithValue(err)
+        }
+    }
+)
+
 export const changePassword = createAsyncThunk(
     'users/changePassword',
     async (payload: { oldPassword: string, newPassword: string } | any, thunkApi) => {
@@ -159,9 +203,18 @@ export const checkAuthentication = createAsyncThunk(
     }
 )
 
-export const getAllMember = createAsyncThunk('users/get-all', async (_, thunkApi) => {
+export const getAllMember = createAsyncThunk('users/getAllMember', async (_, thunkApi) => {
     try {
         const response = await userApi.getAllMember();
+        return response.data;
+    } catch (err) {
+        return thunkApi.rejectWithValue(err);
+    }
+});
+
+export const getAllAdmin = createAsyncThunk('users/getAllAdmin', async (_, thunkApi) => {
+    try {
+        const response = await userApi.getAllAdmin();
         return response.data;
     } catch (err) {
         return thunkApi.rejectWithValue(err);
@@ -199,6 +252,9 @@ const userSlice = createSlice({
         });
         builder.addCase(getAllMember.fulfilled, (state, action) => {
             state.managementUsers = action.payload
+        });
+        builder.addCase(getAllAdmin.fulfilled, (state, action) => {
+            state.managementAdmins = action.payload
         });
     }
 })

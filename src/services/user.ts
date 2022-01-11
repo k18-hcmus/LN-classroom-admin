@@ -20,6 +20,14 @@ export const getUserDataById = (id: string) => {
     return api.get(BASE_URL + `${id}`)
 }
 
+export const banUserById = (id: string) => {
+    return api.post(BASE_URL + `${id}/ban`)
+}
+
+export const mapStudentId = (id: string, studentId: string) => {
+    return api.post(BASE_URL + `${id}/map-student-id`, { studentId })
+}
+
 export const getUserDataByStudentId = (studentId: string) => {
     return api.get(BASE_URL + `students/${studentId}`)
 }

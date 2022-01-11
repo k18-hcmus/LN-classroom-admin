@@ -1,6 +1,7 @@
-import HomeIcon from '@mui/icons-material/Home';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
 import UserPage from '../core/user-management';
+import AdminPage from '../core/admin-management';
 import UserProfile from '../core/user-profile';
 import PersonIcon from '@mui/icons-material/Person';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
@@ -15,6 +16,7 @@ export interface IRoute {
 
 export enum RouteName {
     USER = 'Users',
+    ADMIN = 'Admin',
     PROFILE = 'Profile'
 }
 
@@ -24,8 +26,16 @@ const RouteList: IRoute[] = [
         component: UserPage,
         path: "/",
         exactPath: true,
-        unselectedIcon: HomeOutlinedIcon,
-        selectedIcon: HomeIcon,
+        unselectedIcon: ManageAccountsOutlinedIcon,
+        selectedIcon: ManageAccountsIcon,
+    },
+    {
+        name: RouteName.ADMIN,
+        component: AdminPage,
+        path: "/admin",
+        exactPath: true,
+        unselectedIcon: ManageAccountsOutlinedIcon,
+        selectedIcon: ManageAccountsIcon,
     },
     {
         name: RouteName.PROFILE,
