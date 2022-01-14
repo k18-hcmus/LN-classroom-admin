@@ -18,6 +18,10 @@ import { getAllAdmin, User } from '../../slices/user-slice';
 import Page from '../components/page';
 import SearchNotFound from '../components/search-not-found';
 import { UserListHead, UserListToolbar } from '../components/user';
+import CreateAdminForm from './components/create-admin-form';
+import { sentenceCase } from 'change-case';
+import { USER_STATUS } from '../../shared/constant';
+import Label from '../components/label';
 
 //
 
@@ -28,6 +32,7 @@ const TABLE_HEAD = [
     { id: 'email', label: 'Email', alignRight: false },
     { id: 'firstName', label: 'Name', alignRight: false },
     { id: 'createdAt', label: 'Created At', alignRight: false },
+    { id: 'status', label: 'Status', alignRight: false },
     { id: '', label: '', alignRight: false },
 ];
 
@@ -84,6 +89,7 @@ export default function UserManagement() {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const dispatch = useAppDispatch();
     const users = useAppSelector((state) => state.userReducer.managementAdmins);
+    const [isModeCreateAdmin, setModeCreateAdmin] = useState(false)
 
     useEffect(() => {
         dispatch(selectRoute(RouteName.ADMIN))
@@ -118,95 +124,107 @@ export default function UserManagement() {
     const isUserNotFound = filteredUsers.length === 0;
 
     return (
-        <Page title="Users">
-            <Container>
-                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-                    <Typography variant="h4" gutterBottom>
-                        Admins Management
-                    </Typography>
-                    <Button
-                        variant="contained"
-                        color='success'
-                        startIcon={<Icon icon={plusFill} />}
-                    >
-                        New Admin
-                    </Button>
-                </Stack>
+        !isModeCreateAdmin ?
+            <Page title="Users">
+                <Container>
+                    <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+                        <Typography variant="h4" gutterBottom>
+                            Admins Management
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            color='success'
+                            startIcon={<Icon icon={plusFill} />}
+                            onClick={() => setModeCreateAdmin(true)}
+                        >
+                            New Admin
+                        </Button>
+                    </Stack>
 
-                <Card>
-                    <UserListToolbar
-                        filterName={filterName}
-                        onFilterName={handleFilterByName}
-                    />
-                    <TableContainer sx={{ minWidth: 1000 }}>
-                        <Table>
-                            <UserListHead
-                                order={order}
-                                orderBy={orderBy}
-                                headLabel={TABLE_HEAD}
-                                rowCount={users.length}
-                                onRequestSort={handleRequestSort}
-                            />
-                            <TableBody>
-                                {filteredUsers
-                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                    .map((row: User) => {
-                                        const {
-                                            _id,
-                                            username,
-                                            email,
-                                            firstName,
-                                            lastName,
-                                            createdAt
-                                        } = row;
-
-                                        return (
-                                            <TableRow
-                                                hover
-                                                key={_id}
-                                                tabIndex={-1}
-                                                role="checkbox"
-                                            >
-                                                <TableCell align="left">{username}</TableCell>
-                                                <TableCell align="left">{email}</TableCell>
-                                                <TableCell align="left">{`${firstName} ${lastName}`}</TableCell>
-                                                <TableCell align="left">{new Date(createdAt!).toLocaleString("en")}</TableCell>
-                                                <TableCell align="right">
-                                                    <IconButton component={RouterLink} to={`/users/${_id}`} target="_blank" rel="noopener noreferrer">
-                                                        <RemoveRedEyeIcon />
-                                                    </IconButton >
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-                                    })}
-                                {emptyRows > 0 && (
-                                    <TableRow style={{ height: 53 * emptyRows }}>
-                                        <TableCell colSpan={6} />
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                            {isUserNotFound && (
+                    <Card>
+                        <UserListToolbar
+                            filterName={filterName}
+                            onFilterName={handleFilterByName}
+                        />
+                        <TableContainer sx={{ minWidth: 1000 }}>
+                            <Table>
+                                <UserListHead
+                                    order={order}
+                                    orderBy={orderBy}
+                                    headLabel={TABLE_HEAD}
+                                    rowCount={users.length}
+                                    onRequestSort={handleRequestSort}
+                                />
                                 <TableBody>
-                                    <TableRow>
-                                        <TableCell align="center" colSpan={12}>
-                                            <SearchNotFound searchQuery={filterName} />
-                                        </TableCell>
-                                    </TableRow>
+                                    {filteredUsers
+                                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                        .map((row: User) => {
+                                            const {
+                                                _id,
+                                                username,
+                                                email,
+                                                firstName,
+                                                lastName,
+                                                createdAt,
+                                                status
+                                            } = row;
+
+                                            return (
+                                                <TableRow
+                                                    hover
+                                                    key={_id}
+                                                    tabIndex={-1}
+                                                    role="checkbox"
+                                                >
+                                                    <TableCell align="left">{username}</TableCell>
+                                                    <TableCell align="left">{email}</TableCell>
+                                                    <TableCell align="left">{`${firstName} ${lastName}`}</TableCell>
+                                                    <TableCell align="left">{new Date(createdAt!).toLocaleString("en")}</TableCell>
+                                                    <TableCell align="left">
+                                                        <Label
+                                                            variant="ghost"
+                                                            color={(status !== USER_STATUS.ACTIVATED && 'error') || 'success'}
+                                                        >
+                                                            {sentenceCase(status!)}
+                                                        </Label>
+                                                    </TableCell>
+                                                    <TableCell align="right">
+                                                        <IconButton component={RouterLink} to={`/users/${_id}`} target="_blank" rel="noopener noreferrer">
+                                                            <RemoveRedEyeIcon />
+                                                        </IconButton >
+                                                    </TableCell>
+                                                </TableRow>
+                                            );
+                                        })}
+                                    {emptyRows > 0 && (
+                                        <TableRow style={{ height: 53 * emptyRows }}>
+                                            <TableCell colSpan={6} />
+                                        </TableRow>
+                                    )}
                                 </TableBody>
-                            )}
-                        </Table>
-                    </TableContainer>
-                    <TablePagination
-                        rowsPerPageOptions={[5, 10, 25]}
-                        component="div"
-                        count={users.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                    />
-                </Card>
-            </Container>
-        </Page >
+                                {isUserNotFound && (
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell align="center" colSpan={12}>
+                                                <SearchNotFound searchQuery={filterName} />
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                )}
+                            </Table>
+                        </TableContainer>
+                        <TablePagination
+                            rowsPerPageOptions={[5, 10, 25]}
+                            component="div"
+                            count={users.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                        />
+                    </Card>
+                </Container>
+            </Page >
+            : <CreateAdminForm backToManagePage={() => setModeCreateAdmin(false)} />
     );
 }

@@ -5,6 +5,7 @@ import { FunctionComponent, useEffect, useState } from "react";
 import { useParams } from 'react-router-dom';
 import { useAppDispatch } from "../../../app/hooks";
 import { getUserDataById } from '../../../services/user';
+import { USER_ROLE } from '../../../shared/constant';
 import { createAlert } from '../../../slices/alert-slice';
 import SpinnerLoading from '../../components/spinner-loading';
 
@@ -122,6 +123,15 @@ const UserProfileMapping: FunctionComponent = () => {
                                 margin="normal"
                                 required
                                 fullWidth
+                                label="Role"
+                                value={studentInfor.role}
+                                disabled={true}
+                            />
+                            <Box mt={(theme) => theme.spacing(4)} />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
                                 label="Email"
                                 value={studentInfor.email}
                                 disabled={true}
@@ -136,15 +146,21 @@ const UserProfileMapping: FunctionComponent = () => {
                                 disabled={true}
                             />
                             <Box mt={(theme) => theme.spacing(4)} />
-                            <TextField
-                                margin="normal"
-                                required
-                                fullWidth
-                                label="Student Id"
-                                value={studentInfor.studentId}
-                                disabled={true}
-                            />
-                            <Box mt={(theme) => theme.spacing(4)} />
+                            {
+                                studentInfor.role === USER_ROLE.MEMBER && (
+                                    <>
+                                        <TextField
+                                            margin="normal"
+                                            required
+                                            fullWidth
+                                            label="Student Id"
+                                            value={studentInfor.studentId}
+                                            disabled={true}
+                                        />
+                                        <Box mt={(theme) => theme.spacing(4)} />
+                                    </>
+                                )
+                            }
                         </ColumnBox>
                     </Box>
                 </HorizontalCenterContainer >

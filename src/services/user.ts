@@ -1,4 +1,5 @@
 import { USER_ROLE } from '../shared/constant'
+import { User } from '../slices/user-slice'
 import api from './api'
 
 const BASE_URL = 'users/'
@@ -31,6 +32,8 @@ export const mapStudentId = (id: string, studentId: string) => {
 export const getUserDataByStudentId = (studentId: string) => {
     return api.get(BASE_URL + `students/${studentId}`)
 }
-
+export const createAdminUser = (user: User) => {
+    return api.post(`${BASE_URL}create-admin`, user)
+}
 export const getAllAdmin = () => api.get(`${BASE_URL}?role=${USER_ROLE.ADMIN}`);
 export const getAllMember = () => api.get(`${BASE_URL}?role=${USER_ROLE.MEMBER}`);

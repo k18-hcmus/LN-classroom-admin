@@ -1,10 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import * as userApi from '../services/user';
 import * as authApi from '../services/auth';
 import { ERROR_MESSAGE, LOGIN_FAILED } from "../shared/messages";
 import { createAlert } from "./alert-slice";
 import { USER_ROLE, USER_STATUS } from "../shared/constant";
+import { STATUS_CODES } from "http";
 
 export interface User {
     _id?: string,
@@ -191,6 +192,36 @@ export const changePassword = createAsyncThunk(
     }
 )
 
+export const createAdminUser = createAsyncThunk(
+    'users/createAdminUser',
+    async (info: User | any, thunkApi) => {
+        try {
+            const response = await userApi.createAdminUser({
+                firstName: info.firstName,
+                lastName: info.lastName,
+                email: info.email,
+                password: info.password,
+                username: info.username,
+            })
+            thunkApi.dispatch(getAllAdmin())
+            thunkApi.dispatch(createAlert({
+                message: `Create admin ${info.username} successfully!`,
+                severity: 'success'
+            }))
+            return response.data
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                const message = `Error: ${err.message}` || ERROR_MESSAGE
+                thunkApi.dispatch(createAlert({
+                    message,
+                    severity: 'error'
+                }))
+            }
+            return thunkApi.rejectWithValue(err)
+        }
+    }
+)
+
 export const checkAuthentication = createAsyncThunk(
     'users/checkAuthentication',
     async (_, thunkApi) => {
@@ -244,8 +275,13 @@ const userSlice = createSlice({
             state.isLoading = false
 
         });
-        builder.addCase(checkAuthentication.rejected, (state) => {
+        builder.addCase(checkAuthentication.rejected, (state, action) => {
             state.isLoading = false
+            const statusCode = (action.payload as AxiosError).response?.status
+            if (statusCode === STATUS_CODES.FORBIDDEN) {
+                state.user = action.payload as User
+                state.isAuthenticated = true
+            }
         });
         builder.addCase(updateProfile.fulfilled, (state, action) => {
             state.user = action.payload
