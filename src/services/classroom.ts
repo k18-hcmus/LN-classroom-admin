@@ -8,8 +8,12 @@ export const createClassroom = (classroom: Classroom) => {
     return api.post(BASE_URL, classroom)
 }
 
-export const getAllClassroom = () => {
+export const getAllClassroomById = () => {
     return api.get(BASE_URL)
+}
+
+export const getAllClassroom = () => {
+    return api.get(BASE_URL + "all")
 }
 
 export const joinClassByLink = (token: string) => {

@@ -1,4 +1,4 @@
-import { Divider, Drawer, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography } from '@mui/material';
+import { Drawer, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Box } from '@mui/system';
 import { Link } from 'react-router-dom';
@@ -24,8 +24,6 @@ const StyledListItemText = styled(Typography)<{ isSelected: boolean }>(({ theme,
 
 export default function SideBar() {
     const currentSelected = useAppSelector((state) => state.routeReducer.currentSelected)
-    const enrolledClassrooms = useAppSelector(({ classroomReducer }) => classroomReducer.enrolledClassrooms)
-    const teachingClassrooms = useAppSelector(({ classroomReducer }) => classroomReducer.teachingClassrooms)
 
     return (
         <Drawer
@@ -59,54 +57,6 @@ export default function SideBar() {
                         </ListItem>
                     ))}
                 </List>
-                {enrolledClassrooms.length > 0 &&
-                    (<>
-                        <Divider />
-                        <SidebarLabel > Enrolled </SidebarLabel>
-                        <List>
-                            {enrolledClassrooms.map((classroom, index) => (
-                                <ListItem
-                                    key={index}
-                                    button
-                                    component={Link}
-                                    to={`/classrooms/${classroom._id}`}
-                                    selected={currentSelected === classroom._id}
-                                >
-                                    <ListItemText
-                                        disableTypography
-                                        sx={{ ml: theme => theme.spacing(4) }}
-                                        primary={<StyledListItemText isSelected={currentSelected === classroom._id}>
-                                            {classroom.name}
-                                        </StyledListItemText>} />
-                                </ListItem>
-                            ))}
-                        </List>
-                    </>
-                    )}
-                {teachingClassrooms.length > 0 &&
-                    (<>
-                        <Divider />
-                        <SidebarLabel > Teaching </SidebarLabel>
-                        <List>
-                            {teachingClassrooms.map((classroom, index) => (
-                                <ListItem
-                                    key={index}
-                                    button
-                                    component={Link}
-                                    to={`/classrooms/${classroom._id}`}
-                                    selected={currentSelected === classroom._id}
-                                >
-                                    <ListItemText
-                                        disableTypography
-                                        sx={{ ml: theme => theme.spacing(4) }}
-                                        primary={<StyledListItemText isSelected={currentSelected === classroom._id}>
-                                            {classroom.name}
-                                        </StyledListItemText>} />
-                                </ListItem>
-                            ))}
-                        </List>
-                    </>
-                    )}
             </Box>
         </Drawer >
     );

@@ -2,8 +2,6 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import { Switch } from "react-router-dom";
 import AppBar from './components/app-bar';
-import CreateClassroomModal from './components/create-class-modal';
-import JoinClassroomModal from './components/join-class-modal';
 import SideBar from './components/side-bar';
 interface LayoutProps {
   children: any
@@ -21,8 +19,6 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
         <Switch>
           {children}
         </Switch>
-        <CreateClassroomModal />
-        <JoinClassroomModal />
       </Box>
     </Box>
   );
