@@ -16,7 +16,7 @@ export interface IRoute {
 
 export enum RouteName {
     USER = 'Users',
-    ADMIN = 'Admin',
+    ADMIN = 'Admins',
     PROFILE = 'Profile'
 }
 
