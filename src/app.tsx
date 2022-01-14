@@ -5,6 +5,7 @@ import {
 } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import ListRouter from "./app/routes";
+import ClassroomDetail from './core/classroom-management/components/classroom-detail';
 import AlertSnackBar from './core/components/alert';
 import LoadingScreen from './core/components/loading-screen';
 import PageNotFound from './core/components/page-not-found';
@@ -12,7 +13,6 @@ import LoginPage from './core/signin';
 import UserProfile from './core/user-profile';
 import UserProfileMapping from './core/user-profile/components/user-profile-mapping';
 import Layout from './layout';
-import { getAllClassroom } from './slices/classroom-slice';
 import { checkAuthentication } from './slices/user-slice';
 
 const PRE_URL = 'preUrl'
@@ -31,7 +31,6 @@ const App = () => {
 
     useEffect(() => {
         if (isAuthenticated) {
-            dispatch(getAllClassroom())
             const preUrl = localStorage.getItem(PRE_URL) || "/"
             history && history.push(preUrl)
             localStorage.removeItem(PRE_URL)
@@ -64,6 +63,7 @@ const App = () => {
                             />
                         ))}
                         <Route exact path={"/users/:userId"} component={UserProfileMapping} />
+                        <Route exact path={"/classrooms/:classroomId"} component={ClassroomDetail} />
                         <Route exact path={"/profile"} component={UserProfile} />
                         <Route path={"*"} component={PageNotFound} />
                     </Layout>
